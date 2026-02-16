@@ -1,0 +1,38 @@
+{
+  "description": "Docker logging driver for Axiom.co",
+  "documentation": "https://github.com/ashutoshpw/axiom-docker-logger",
+  "entrypoint": ["/axiom-docker-logger"],
+  "interface": {
+    "types": ["docker.logdriver/1.0"],
+    "socket": "axiom.sock"
+  },
+  "linux": {
+    "capabilities": ["CAP_NET_BIND_SERVICE"],
+    "allow-all-devices": false,
+    "devices": null
+  },
+  "env": [
+    {
+      "name": "AXIOM_TOKEN",
+      "description": "Axiom API token",
+      "settable": ["value"],
+      "value": ""
+    },
+    {
+      "name": "AXIOM_DATASET",
+      "description": "Default dataset name",
+      "settable": ["value"],
+      "value": "docker-logs"
+    },
+    {
+      "name": "AXIOM_URL",
+      "description": "Axiom API URL",
+      "settable": ["value"],
+      "value": "https://api.axiom.co"
+    }
+  ],
+  "network": {
+    "type": "host"
+  },
+  "propagated-mount": null
+}
