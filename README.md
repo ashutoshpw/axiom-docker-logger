@@ -53,6 +53,14 @@ Enable if not already enabled:
 docker plugin enable ashutoshpw/axiom-docker-logger:latest
 ```
 
+## Tags
+
+| Tag | Description |
+| --- | --- |
+| `latest` | Latest stable release, updated when a `v*` tag is pushed |
+| `X.Y.Z` | Immutable release, e.g. `1.2.3` |
+| `edge` | Latest build from `main`, may be unstable |
+
 ## Usage
 
 Use it with your containers:

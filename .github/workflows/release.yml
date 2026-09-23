@@ -1,10 +1,16 @@
-# .github/workflows/release.yml
-name: Release Plugin
+name: Release
 
 on:
   push:
     tags:
       - 'v*'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   release:
@@ -12,19 +18,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Get version
+        id: version
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Get version
-        id: version
-        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+      - name: Build plugin
+        run: make clean build
 
-      - name: Build and push plugin
+      - name: Smoke test plugin
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: make PLUGIN_TAG="$VERSION" smoke
+
+      - name: Publish plugin
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
         run: |
-          make VERSION=${{ steps.version.outputs.VERSION }} clean build create push
-          # Also push as latest
-          docker plugin create ashutoshpw/axiom-docker-logger:latest ./plugin
-          docker plugin push ashutoshpw/axiom-docker-logger:latest
+          if [[ "$VERSION" == *-* ]]; then
+            ./scripts/publish.sh "$VERSION"
+          else
+            ./scripts/publish.sh "$VERSION" latest
+          fi
