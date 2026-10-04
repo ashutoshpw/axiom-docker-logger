@@ -55,6 +55,7 @@ func main() {
 	// Initialize the Axiom client.
 	opts := []axiom.Option{
 		axiom.SetToken(token),
+		axiom.SetNoRetry(),
 		axiom.SetURL(axiomURL),
 	}
 	client, err := axiom.NewClient(opts...)
