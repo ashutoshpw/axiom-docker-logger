@@ -1,23 +1,49 @@
 name: CI
-
 on:
   pull_request:
-
+  workflow_call:
 permissions:
   contents: read
-
-concurrency:
-  group: ci-${{ github.head_ref || github.ref }}
-  cancel-in-progress: true
-
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  check:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-24.04
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v7
-
-      - name: Build plugin
-        run: make clean build
-
-      - name: Smoke test plugin
-        run: make PLUGIN_TAG=ci smoke
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Test and analyze
+        run: make test
+      - name: Build native plugin
+        run: make build
+        env:
+          ARCH: ${{ matrix.arch }}
+      - name: Verify actual Docker log delivery
+        run: make smoke
+      - name: Package tested rootfs
+        run: tar -czf plugin.tar.gz -C plugin config.json rootfs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: plugin-${{ matrix.arch }}
+          path: plugin.tar.gz
+          retention-days: 7
+  skill:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Discover distributable skill
+        run: npx --yes skills add . --list
+        env:
+          DISABLE_TELEMETRY: '1'

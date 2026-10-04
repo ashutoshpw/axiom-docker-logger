@@ -1,13 +1,4 @@
-#!/bin/bash
-
-# Login to Docker Hub
-docker login
-
-# Build and create locally first
-make clean build create
-
-# Test it works
-docker plugin enable ashutoshpw/axiom-docker-logger:latest
-
-# Push to Docker Hub
-make push
+#!/usr/bin/env bash
+set -euo pipefail
+echo 'Publishing is managed by GitHub Actions. Push main for edge or a vX.Y.Z tag for a release.'
+echo 'For a local build and delivery check: make build smoke'

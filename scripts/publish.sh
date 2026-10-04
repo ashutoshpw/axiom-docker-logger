@@ -1,24 +1,10 @@
 #!/usr/bin/env bash
+# Publish an unconfigured managed plugin, preserving the Docker plugin media type.
 set -euo pipefail
-
 cd "$(dirname "$0")/.."
-
-if [ "$#" -lt 1 ]; then
-  echo "usage: $0 <tag> [tag...]" >&2
-  exit 1
-fi
-
-if [ ! -d plugin/rootfs ]; then
-  echo "plugin/rootfs is missing; run 'make clean build' first" >&2
-  exit 1
-fi
-
-for tag in "$@"; do
-  make PLUGIN_TAG="$tag" create
-  if [ "${DRY_RUN:-0}" = "1" ]; then
-    echo "DRY_RUN=1: skipping push of $tag"
-  else
-    make PLUGIN_TAG="$tag" push
-  fi
-  make PLUGIN_TAG="$tag" rm
-done
+[[ $# == 1 ]] || { echo 'usage: publish.sh <registry/repository:candidate-tag>' >&2; exit 1; }
+ref=$1
+[[ -d "${PLUGIN_DIR:-plugin}/rootfs" ]] || { echo 'Build rootfs first' >&2; exit 1; }
+docker plugin create "$ref" "${PLUGIN_DIR:-plugin}"
+trap 'docker plugin rm "$ref" >/dev/null' EXIT
+docker plugin push "$ref"
