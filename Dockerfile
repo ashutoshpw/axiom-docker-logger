@@ -1,5 +1,7 @@
 # Build stage
-FROM golang:1.24-alpine AS builder
+FROM --platform=$BUILDPLATFORM golang:1.24-alpine AS builder
+ARG TARGETOS
+ARG TARGETARCH
 
 RUN apk add --no-cache git ca-certificates
 
@@ -10,7 +12,7 @@ RUN go mod download
 
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build \
     -ldflags="-s -w" \
     -o /axiom-docker-logger \
     .
