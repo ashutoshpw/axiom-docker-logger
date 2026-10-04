@@ -15,10 +15,10 @@ Publish native AMD64/ARM64 managed plugins to Docker Hub and GHCR; ship a root s
 
 ## Steps
 - [x] Regression tests, driver lifecycle and retry fixes.
-- [ ] Native architecture builds and actual Docker delivery smoke checks.
-- [ ] Candidate publication, registry verification and guarded promotion workflows.
+- [x] Native architecture builds and actual Docker delivery smoke checks.
+- [x] Candidate publication, registry verification and guarded promotion workflows.
 - [x] Correct README and self-contained skills/axiom-docker-logging skill.
-- [ ] Validate, commit scoped changes, record evidence and remaining external gates.
+- [x] Validate, commit scoped changes, record evidence and remaining external gates.
 
 ## Acceptance
 Race tests and vet pass; original defects reproduced before fixing.
@@ -33,4 +33,17 @@ are separate external checks, never inferred from local success.
 - AMD64 Docker plugin smoke passed idle and immediate-exit stdout/stderr delivery.
 - Skill validator, local discovery and isolated installation with both references passed.
 - Docker Hub already has 0.1.0/latest/edge from September 23; next release is 0.2.0.
-- Docker Hub Actions secrets exist; GHCR package has not yet been created.
+- Docker Hub Actions secrets and repository GITHUB_TOKEN published successfully; GHCR is public.
+
+## Delivery results
+- Merged PR #1: https://github.com/ashutoshpw/axiom-docker-logger/pull/1
+- Release source: fb39f924824f11763bb5041518d1cccfad7a0852, tag v0.2.0.
+- Native AMD64/ARM64 race tests, vet, and real Docker delivery smoke checks passed.
+- Edge publication succeeded: https://github.com/ashutoshpw/axiom-docker-logger/actions/runs/37235536416
+- Release publication succeeded: https://github.com/ashutoshpw/axiom-docker-logger/actions/runs/37235538751
+- Both registries passed anonymous candidate installation and stdout/stderr delivery on both architectures.
+- Published 0.2.0-amd64, 0.2.0-arm64, latest-amd64, latest-arm64; unsuffixed aliases select AMD64.
+- Registries: docker.io/ashutoshpw/axiom-docker-logger and ghcr.io/ashutoshpw/axiom-docker-logger.
+- Public skill installation succeeded with the documented npx command.
+- Live directory page confirmed: https://skills.sh/ashutoshpw/axiom-docker-logger/axiom-docker-logging
+- Live Axiom ingestion/query verification remains unperformed: no production credentials were used.
